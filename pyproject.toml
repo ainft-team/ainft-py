@@ -10,7 +10,14 @@ readme = "README.md"
 python = ">=3.8,<3.12"
 ain-py = "^1.0.3"
 pytest = "^8.1.1"
+pydantic = "^2.6.3"
 
+
+[tool.poetry.group.dev.dependencies]
+pytest-asyncio = "^0.23.5.post1"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
 
 [build-system]
 requires = ["poetry-core"]

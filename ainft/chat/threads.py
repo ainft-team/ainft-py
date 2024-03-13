@@ -27,11 +27,12 @@ class Threads:
         Store a thread.
 
         Args:
-            thread_id: The ID of the thread.
+            thread_id: The ID of the thread,
+                must be a 20-character alphanumeric starting with 'thread_' or a uuid4.
 
-            object_id: The ID of the ainft object.
+            object_id: The ID of the AINFT object.
 
-            token_id: The ID of the ainft token.
+            token_id: The ID of the AINFT token.
 
             metadata: The metadata can contain up to 16 key-value pairs,
                 with the keys limited to 64 characters and the values to 512 characters.
@@ -43,15 +44,13 @@ class Threads:
         await self._validate_token(app_id, token_id)
         self._validate_thread_id(thread_id)
 
-        params = dict(
+        return await self._send_tx_for_store_thread(**dict(
             thread_id=thread_id,
             app_id=app_id,
             token_id=token_id,
             address=user_addr,
             metadata=metadata,
-        )
-
-        return await self._send_tx_for_store_thread(**params)
+        ))
 
     async def _validate_app(self, app_id: str):
         app_path = join_paths(["apps", app_id])
@@ -88,14 +87,14 @@ class Threads:
         if not is_tx_success(tx_result):
             raise RuntimeError(f"Failed to send transaction: {json.dumps(tx_result)}")
 
-        return self._build_tx_result(tx_result, timestamp, **kwargs)
+        return self._format_tx_result(tx_result, timestamp, **kwargs)
 
     def _build_tx_body_for_store_thread(
         self,
-        thread_id: str,
         app_id: str,
         token_id: str,
         address: str,
+        thread_id: str,
         timestamp: int,
         metadata: Optional[object],
     ) -> TransactionInput:
@@ -125,9 +124,9 @@ class Threads:
             gas_price=500,
         )
 
-    def _build_tx_result(
+    def _format_tx_result(
         self,
-        tx_result: Dict,
+        tx_result: dict,
         timestamp: int,
         thread_id: str,
         **kwargs,

@@ -6,7 +6,7 @@ from .data import *
 
 
 class TestAinft:
-    def test_initialization(self) -> None:
+    def test_initialization(self):
         ainft = Ainft(
             private_key=private_key,
             api_url=api_url,

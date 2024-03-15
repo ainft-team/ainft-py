@@ -21,7 +21,6 @@ class TestThreads:
             token_id=token_id,
         )
 
-        tx_pattern = "^0x([A-Fa-f0-9]{64})$"
         assert re.match(tx_pattern, result.tx_hash) is not None
         assert result.result is not None
         assert result.thread.id == "15f576b9-2bba-446b-b416-5cff3687f5da"

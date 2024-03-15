@@ -5,6 +5,7 @@ from functools import cached_property
 from ain.ain import Ain
 
 from .threads import Threads
+from .messages import Messages
 
 
 class Chat:
@@ -14,3 +15,7 @@ class Chat:
     @cached_property
     def threads(self) -> Threads:
         return Threads(self._ain)
+
+    @cached_property
+    def messages(self) -> Messages:
+        return Messages(self._ain)

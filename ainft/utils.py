@@ -56,6 +56,28 @@ async def validate_token(app_id: str, token_id: str, db: Database):
         raise ValueError(f"The token {token_id} does not exist.")
 
 
+async def validate_thread(
+    app_id: str, token_id: str, address: str, thread_id: str, db: Database
+):
+    thread_path = join_paths(
+        [
+            "apps",
+            app_id,
+            "tokens",
+            token_id,
+            "ai",
+            "ainize_openai",
+            "history",
+            address,
+            "threads",
+            thread_id,
+        ]
+    )
+    thread = await db.ref(thread_path).getValue()
+    if thread is None:
+        raise ValueError(f"The thread {thread_id} does not exist.")
+
+
 def validate_thread_id(thread_id: str):
     if not is_valid_thread_id(thread_id):
         raise ValueError(f"Invalid thread ID.")
@@ -68,5 +90,19 @@ def is_valid_thread_id(thread_id: str) -> bool:
         pass
     pattern = r"thread_[A-Za-z0-9]{20}$"
     if re.match(pattern, thread_id):
+        return True
+    return False
+
+
+def validate_message_id(message_id: str):
+    if not is_valid_message_id(message_id):
+        raise ValueError(f"Invalid message ID.")
+
+
+def is_valid_message_id(message_id: str) -> bool:
+    if message_id.isdigit():
+        return True
+    pattern = r"msg_[A-Za-z0-9]{20}$"
+    if re.match(pattern, message_id):
         return True
     return False

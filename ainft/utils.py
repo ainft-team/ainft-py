@@ -6,11 +6,15 @@ import uuid
 from typing import Any
 
 
-from ain.ain import Database
+from ain.ain import Database, Wallet
 
 
 def get_app_id(object_id: str) -> str:
     return f"ainft721_{object_id.lower()}"
+
+
+def get_user_address(wallet: Wallet) -> str | None:
+    return getattr(wallet.defaultAccount, "address", None)
 
 
 def is_tx_success(tx_result: Any) -> bool:
@@ -29,6 +33,13 @@ def join_paths(paths: list) -> str:
 
 def now() -> float:
     return datetime.now().timestamp()
+
+
+def validate_user_address(wallet: Wallet) -> str:
+    user_addr = get_user_address(wallet)
+    if user_addr is None:
+        raise ValueError(f"The default account not found.")
+    return user_addr
 
 
 async def validate_app(app_id: str, db: Database):

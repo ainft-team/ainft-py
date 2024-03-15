@@ -19,7 +19,7 @@ class Threads:
         thread_id: str,
         object_id: str,
         token_id: str,
-        metadata: Optional[object] = None,
+        metadata: Optional[dict] = None,
     ) -> ThreadTransactionResult:
         """
         Store a thread.
@@ -36,19 +36,24 @@ class Threads:
                 with the keys limited to 64 characters and the values to 512 characters.
         """
         app_id = get_app_id(object_id)
-        user_addr = self._ain.wallet.defaultAccount.address
+        user_addr = validate_user_address(self._ain.wallet)
 
+        await self._validate(app_id, token_id, thread_id)
+
+        return await self._send_tx_for_store_thread(
+            **dict(
+                thread_id=thread_id,
+                app_id=app_id,
+                token_id=token_id,
+                address=user_addr,
+                metadata=metadata,
+            )
+        )
+
+    async def _validate(self, app_id: str, token_id: str, thread_id: str):
         await validate_app(app_id, self._ain.db)
         await validate_token(app_id, token_id, self._ain.db)
         validate_thread_id(thread_id)
-
-        return await self._send_tx_for_store_thread(**dict(
-            thread_id=thread_id,
-            app_id=app_id,
-            token_id=token_id,
-            address=user_addr,
-            metadata=metadata,
-        ))
 
     async def _send_tx_for_store_thread(self, **kwargs) -> ThreadTransactionResult:
         timestamp = int(now())
@@ -64,10 +69,10 @@ class Threads:
         self,
         app_id: str,
         token_id: str,
-        address: str,
         thread_id: str,
+        address: str,
         timestamp: int,
-        metadata: Optional[object],
+        metadata: Optional[dict],
     ) -> TransactionInput:
         thread_path = join_paths(
             [
@@ -83,12 +88,13 @@ class Threads:
                 thread_id,
             ]
         )
-        value = {"messages": True}
-        if metadata:
-            value["metadata"] = metadata
-        operation = SetOperation(type="SET_VALUE", ref=thread_path, value=value)
+        thread = {
+            "messages": True,
+            **({"metadata": metadata if metadata else {}}),
+        }
+        op = SetOperation(type="SET_VALUE", ref=thread_path, value=thread)
         return TransactionInput(
-            operation=operation,
+            operation=op,
             timestamp=timestamp,
             nonce=-1,
             address=address,
@@ -98,8 +104,8 @@ class Threads:
     def _format_tx_result(
         self,
         tx_result: dict,
-        timestamp: int,
         thread_id: str,
+        timestamp: int,
         **kwargs,
     ) -> ThreadTransactionResult:
         metadata = kwargs.get("metadata", {})

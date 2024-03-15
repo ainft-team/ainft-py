@@ -71,7 +71,7 @@ class Messages:
         if not is_tx_success(tx_result):
             raise RuntimeError(f"Failed to send transaction: {json.dumps(tx_result)}")
 
-        return self._format_tx_result(tx_result, **kwargs)
+        return self._format_tx_result(tx_result=tx_result, **kwargs)
 
     def _build_tx_body_for_store_message(
         self,

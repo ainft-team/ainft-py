@@ -1,5 +1,7 @@
 # ainft-py
 
+[![PyPi Version](https://img.shields.io/pypi/v/ainft-py.svg)](https://pypi.python.org/pypi/ainft-py/)
+
 A python version of [ainft-js](https://github.com/ainft-team/ainft-js).
 
 ## Installation
@@ -9,6 +11,7 @@ pip install ainft-py
 ```
 
 ## Usage
+
 ```python
 import os
 from ainft import Ainft
@@ -22,4 +25,5 @@ ainft = Ainft(
 ```
 
 ## Requirements
+
 Python version should be at least 3.8 but less than 3.12.

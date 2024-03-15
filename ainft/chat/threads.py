@@ -63,7 +63,9 @@ class Threads:
         if not is_tx_success(tx_result):
             raise RuntimeError(f"Failed to send transaction: {json.dumps(tx_result)}")
 
-        return self._format_tx_result(tx_result, timestamp, **kwargs)
+        return self._format_tx_result(
+            tx_result=tx_result, timestamp=timestamp, **kwargs
+        )
 
     def _build_tx_body_for_store_thread(
         self,
@@ -90,7 +92,7 @@ class Threads:
         )
         thread = {
             "messages": True,
-            **({"metadata": metadata if metadata else {}}),
+            **({"metadata": metadata} if metadata else {}),
         }
         op = SetOperation(type="SET_VALUE", ref=thread_path, value=thread)
         return TransactionInput(
@@ -104,8 +106,8 @@ class Threads:
     def _format_tx_result(
         self,
         tx_result: dict,
-        thread_id: str,
         timestamp: int,
+        thread_id: str,
         **kwargs,
     ) -> ThreadTransactionResult:
         metadata = kwargs.get("metadata", {})

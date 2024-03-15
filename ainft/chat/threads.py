@@ -1,14 +1,12 @@
 from __future__ import annotations
 
 import json
-import re
-import uuid
-from typing import Dict, Optional
+from typing import Optional
 
 from ain.ain import Ain
 
 from ..types import SetOperation, TransactionInput, Thread, ThreadTransactionResult
-from ..utils import get_app_id, is_tx_success, join_paths, now
+from ..utils import *
 
 
 class Threads:
@@ -21,7 +19,7 @@ class Threads:
         thread_id: str,
         object_id: str,
         token_id: str,
-        metadata: Optional[object] = None,
+        metadata: Optional[dict] = None,
     ) -> ThreadTransactionResult:
         """
         Store a thread.
@@ -38,46 +36,24 @@ class Threads:
                 with the keys limited to 64 characters and the values to 512 characters.
         """
         app_id = get_app_id(object_id)
-        user_addr = self._ain.wallet.defaultAccount.address
+        user_addr = validate_user_address(self._ain.wallet)
 
-        await self._validate_app(app_id)
-        await self._validate_token(app_id, token_id)
-        self._validate_thread_id(thread_id)
+        await self._validate(app_id, token_id, thread_id)
 
-        return await self._send_tx_for_store_thread(**dict(
-            thread_id=thread_id,
-            app_id=app_id,
-            token_id=token_id,
-            address=user_addr,
-            metadata=metadata,
-        ))
+        return await self._send_tx_for_store_thread(
+            **dict(
+                thread_id=thread_id,
+                app_id=app_id,
+                token_id=token_id,
+                address=user_addr,
+                metadata=metadata,
+            )
+        )
 
-    async def _validate_app(self, app_id: str):
-        app_path = join_paths(["apps", app_id])
-        app = await self._ain.db.ref(app_path).getValue()
-        if app is None:
-            raise ValueError(f"The app {app_id} does not exist.")
-
-    async def _validate_token(self, app_id: str, token_id: str):
-        token_path = join_paths(["apps", app_id, "tokens", token_id])
-        token = await self._ain.db.ref(token_path).getValue()
-        if token is None:
-            raise ValueError(f"The token {token_id} does not exist.")
-
-    def _validate_thread_id(self, thread_id: str):
-        if not self._is_valid_thread_id(thread_id):
-            raise ValueError(f"Invalid thread ID.")
-
-    def _is_valid_thread_id(self, thread_id: str) -> bool:
-        try:
-            thread_uuid = uuid.UUID(thread_id, version=4)
-            return str(thread_uuid) == thread_id
-        except ValueError:
-            pass
-        pattern = r"thread_[A-Za-z0-9]{20}$"
-        if re.match(pattern, thread_id):
-            return True
-        return False
+    async def _validate(self, app_id: str, token_id: str, thread_id: str):
+        await validate_app(app_id, self._ain.db)
+        await validate_token(app_id, token_id, self._ain.db)
+        validate_thread_id(thread_id)
 
     async def _send_tx_for_store_thread(self, **kwargs) -> ThreadTransactionResult:
         timestamp = int(now())
@@ -93,10 +69,10 @@ class Threads:
         self,
         app_id: str,
         token_id: str,
-        address: str,
         thread_id: str,
+        address: str,
         timestamp: int,
-        metadata: Optional[object],
+        metadata: Optional[dict],
     ) -> TransactionInput:
         thread_path = join_paths(
             [
@@ -112,12 +88,13 @@ class Threads:
                 thread_id,
             ]
         )
-        value = {"messages": True}
-        if metadata:
-            value["metadata"] = metadata
-        operation = SetOperation(type="SET_VALUE", ref=thread_path, value=value)
+        thread = {
+            "messages": True,
+            **({"metadata": metadata if metadata else {}}),
+        }
+        op = SetOperation(type="SET_VALUE", ref=thread_path, value=thread)
         return TransactionInput(
-            operation=operation,
+            operation=op,
             timestamp=timestamp,
             nonce=-1,
             address=address,
@@ -127,12 +104,10 @@ class Threads:
     def _format_tx_result(
         self,
         tx_result: dict,
-        timestamp: int,
         thread_id: str,
+        timestamp: int,
         **kwargs,
     ) -> ThreadTransactionResult:
         metadata = kwargs.get("metadata", {})
         thread = Thread(id=thread_id, metadata=metadata, created_at=timestamp)
-        return ThreadTransactionResult(
-            tx_hash=tx_result["tx_hash"], result=tx_result["result"], thread=thread
-        )
+        return ThreadTransactionResult(thread=thread, **tx_result)

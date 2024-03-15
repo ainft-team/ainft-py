@@ -1,10 +1,11 @@
 [tool.poetry]
 name = "ainft-py"
-version = "0.1.0"
+version = "0.1.0-beta.1"
 description = ""
 authors = ["AINFT Team <dev@ainetwork.ai>"]
 license = "MIT"
 readme = "README.md"
+packages = [{include = "ainft"}]
 
 [tool.poetry.dependencies]
 python = ">=3.8,<3.12"

@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "ainft-py"
+name = "ainft"
 version = "0.1.0-beta.1"
 description = ""
 authors = ["AINFT Team <dev@ainetwork.ai>"]

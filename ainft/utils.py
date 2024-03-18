@@ -35,6 +35,14 @@ def now() -> float:
     return datetime.now().timestamp()
 
 
+def truncate_text(text: str, max_length: int) -> str:
+    if max_length <= 0:
+        raise ValueError("max_length must be greater than 0.")
+    if len(text) > max_length:
+        return text[: max_length - 3] + "..."
+    return text
+
+
 def validate_user_address(wallet: Wallet) -> str:
     user_addr = get_user_address(wallet)
     if user_addr is None:

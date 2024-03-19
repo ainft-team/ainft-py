@@ -8,6 +8,7 @@ from .types import (
     ThreadTransactionResult,
     MessageTransactionResult,
 )
+from .utils import truncate_text
 
 __all__ = [
     "Ainft",
@@ -16,4 +17,5 @@ __all__ = [
     "TransactionResult",
     "ThreadTransactionResult",
     "MessageTransactionResult",
+    "truncate_text",
 ]

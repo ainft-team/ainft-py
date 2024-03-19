@@ -7,4 +7,7 @@ blockchain_url = "https://testnet-api.ainetwork.ai"
 chain_id = 0
 
 object_id = "0xB2710D23834d3ef4651dF66661da94C52df38612"
+app_id = "ainft721_0xb2710d23834d3ef4651df66661da94c52df38612"
 token_id = "1"
+
+thread_id = "15f576b9-2bba-446b-b416-5cff3687f5da"

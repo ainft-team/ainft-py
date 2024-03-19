@@ -40,15 +40,13 @@ class Threads:
 
         await self._validate(app_id, token_id, thread_id)
 
-        return await self._send_tx_for_store_thread(
-            **dict(
-                thread_id=thread_id,
-                app_id=app_id,
-                token_id=token_id,
-                address=user_addr,
-                metadata=metadata,
-            )
-        )
+        return await self._send_tx_for_store_thread(**dict(
+            thread_id=thread_id,
+            app_id=app_id,
+            token_id=token_id,
+            address=user_addr,
+            metadata=metadata,
+        ))
 
     async def _validate(self, app_id: str, token_id: str, thread_id: str):
         await validate_app(app_id, self._ain.db)

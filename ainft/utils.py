@@ -3,6 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 import re
 import uuid
+import unicodedata
 from typing import Any
 
 
@@ -33,6 +34,19 @@ def join_paths(paths: list) -> str:
 
 def now() -> float:
     return datetime.now().timestamp()
+
+
+def normalize_text(text: str) -> str:
+    outputs = unicodedata.normalize("NFKD", text)
+    return "".join([c for c in outputs if not unicodedata.combining(c)])
+
+
+def truncate_text(text: str, max_length: int) -> str:
+    if max_length <= 0:
+        raise ValueError("max_length must be greater than 0.")
+    if len(text) > max_length:
+        return text[: max_length - 3] + "..."
+    return text
 
 
 def validate_user_address(wallet: Wallet) -> str:

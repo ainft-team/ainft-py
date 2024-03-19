@@ -16,8 +16,6 @@ from ..utils import *
 
 
 class Messages:
-    _max_content_length = 200
-
     def __init__(self, ain: Ain):
         self._ain = ain
 
@@ -43,14 +41,12 @@ class Messages:
 
         await self._validate(app_id, token_id, user_addr, messages)
 
-        return await self._send_tx_for_store_message(
-            **dict(
-                messages=messages,
-                app_id=app_id,
-                token_id=token_id,
-                address=user_addr,
-            )
-        )
+        return await self._send_tx_for_store_message(**dict(
+            messages=messages,
+            app_id=app_id,
+            token_id=token_id,
+            address=user_addr,
+        ))
 
     async def _validate(
         self, app_id: str, token_id: str, address: str, messages: List[Message]
@@ -81,10 +77,9 @@ class Messages:
         address: str,
         timestamp: int,
     ) -> TransactionInput:
-        op_list = []
+        ops = []
         for msg in messages:
-            msg_key = str(msg.created_at)
-            msg_path = join_paths(
+            path = join_paths(
                 [
                     "apps",
                     app_id,
@@ -97,20 +92,22 @@ class Messages:
                     "threads",
                     msg.thread_id,
                     "messages",
-                    msg_key,
+                    str(msg.created_at),
                 ]
             )
-            trimmed_content = msg.content[: self._max_content_length]
+            content = normalize_text(msg.content)
+            content = truncate_text(content, 200)
+            content = content.encode("unicode-escape").decode("ASCII")
             message = {
                 "id": msg.id,
                 "role": msg.role,
-                "content": trimmed_content,
+                "content": content,
                 **({"metadata": msg.metadata} if msg.metadata else {}),
             }
-            op = SetOperation(type="SET_VALUE", ref=msg_path, value=message)
-            op_list.append(op)
+            op = SetOperation(type="SET_VALUE", ref=path, value=message)
+            ops.append(op)
 
-        multi_op = SetMultiOperation(type="SET", op_list=op_list)
+        multi_op = SetMultiOperation(type="SET", op_list=ops)
         return TransactionInput(
             operation=multi_op,
             timestamp=timestamp,

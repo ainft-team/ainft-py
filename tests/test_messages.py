@@ -51,7 +51,7 @@ class TestMessages:
             id="3",
             thread_id=thread_id,
             role="user",
-            content="How are you today? 😊🌟🌈",
+            content="How áre you today? 😊🌟🌈",
             assistant_id=None,
             created_at=1710748302,
         )

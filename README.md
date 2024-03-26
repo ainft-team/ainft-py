@@ -6,7 +6,7 @@ A python version of [ainft-js](https://github.com/ainft-team/ainft-js).
 
 ## Installation
 
-```bash
+```sh
 pip install ainft-py
 ```
 
@@ -17,7 +17,7 @@ import os
 from ainft import Ainft
 
 ainft = Ainft(
-    private_key=os.environ.get("AINETWORK_PRIVATE_KEY"),
+    private_key=os.environ.get("AIN_PRIVATE_KEY"),
     api_url="https://ainft-api-dev.ainetwork.ai",
     blockchain_url="https://testnet-api.ainetwork.ai",
     chain_id=0,

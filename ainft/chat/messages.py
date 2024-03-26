@@ -95,8 +95,7 @@ class Messages:
                     str(msg.created_at),
                 ]
             )
-            content = normalize_text(msg.content)
-            content = truncate_text(content, 200)
+            content = truncate_text(msg.content, 200)
             content = content.encode("unicode-escape").decode("ASCII")
             message = {
                 "id": msg.id,

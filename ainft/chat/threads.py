@@ -13,7 +13,7 @@ class Threads:
     def __init__(self, ain: Ain):
         self._ain = ain
 
-    async def store(
+    async def add(
         self,
         *,
         thread_id: str,
@@ -22,7 +22,7 @@ class Threads:
         metadata: Optional[dict] = None,
     ) -> ThreadTransactionResult:
         """
-        Store a thread.
+        Add a thread.
 
         Args:
             thread_id: The ID of the thread,
@@ -40,7 +40,7 @@ class Threads:
 
         await self._validate(app_id, token_id, thread_id)
 
-        return await self._send_tx_for_store_thread(**dict(
+        return await self._send_tx_for_add_thread(**dict(
             thread_id=thread_id,
             app_id=app_id,
             token_id=token_id,
@@ -53,9 +53,9 @@ class Threads:
         await validate_token(app_id, token_id, self._ain.db)
         validate_thread_id(thread_id)
 
-    async def _send_tx_for_store_thread(self, **kwargs) -> ThreadTransactionResult:
+    async def _send_tx_for_add_thread(self, **kwargs) -> ThreadTransactionResult:
         timestamp = int(now())
-        tx_body = self._build_tx_body_for_store_thread(timestamp=timestamp, **kwargs)
+        tx_body = self._build_tx_body_for_add_thread(timestamp=timestamp, **kwargs)
         tx_result = await self._ain.sendTransaction(tx_body)
 
         if not is_tx_success(tx_result):
@@ -65,7 +65,7 @@ class Threads:
             tx_result=tx_result, timestamp=timestamp, **kwargs
         )
 
-    def _build_tx_body_for_store_thread(
+    def _build_tx_body_for_add_thread(
         self,
         app_id: str,
         token_id: str,
@@ -81,7 +81,6 @@ class Threads:
                 "tokens",
                 token_id,
                 "ai",
-                "ainize_openai",
                 "history",
                 address,
                 "threads",

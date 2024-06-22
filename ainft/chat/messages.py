@@ -19,7 +19,7 @@ class Messages:
     def __init__(self, ain: Ain):
         self._ain = ain
 
-    async def store(
+    async def add(
         self,
         *,
         messages: List[Message],
@@ -27,7 +27,7 @@ class Messages:
         token_id: str,
     ) -> MessageTransactionResult:
         """
-        Store a list of messages.
+        Add a list of messages.
 
         Args:
             messages: The list of messages.
@@ -41,7 +41,7 @@ class Messages:
 
         await self._validate(app_id, token_id, user_addr, messages)
 
-        return await self._send_tx_for_store_message(**dict(
+        return await self._send_tx_for_add_message(**dict(
             messages=messages,
             app_id=app_id,
             token_id=token_id,
@@ -59,9 +59,9 @@ class Messages:
             )
             validate_message_id(message.id)
 
-    async def _send_tx_for_store_message(self, **kwargs) -> MessageTransactionResult:
+    async def _send_tx_for_add_message(self, **kwargs) -> MessageTransactionResult:
         timestamp = int(now())
-        tx_body = self._build_tx_body_for_store_message(timestamp=timestamp, **kwargs)
+        tx_body = self._build_tx_body_for_add_message(timestamp=timestamp, **kwargs)
         tx_result = await self._ain.sendTransaction(tx_body)
 
         if not is_tx_success(tx_result):
@@ -69,7 +69,7 @@ class Messages:
 
         return self._format_tx_result(tx_result=tx_result, **kwargs)
 
-    def _build_tx_body_for_store_message(
+    def _build_tx_body_for_add_message(
         self,
         app_id: str,
         token_id: str,
@@ -86,7 +86,6 @@ class Messages:
                     "tokens",
                     token_id,
                     "ai",
-                    "ainize_openai",
                     "history",
                     address,
                     "threads",

@@ -14,13 +14,13 @@ class TestThreads:
         chain_id=chain_id,
     )
 
-    async def test_method_store(self):
-        result = await self.ainft.chat.threads.store(
-            thread_id="15f576b9-2bba-446b-b416-5cff3687f5da",
+    async def test_method_add(self):
+        result = await self.ainft.chat.threads.add(
+            thread_id=thread_id,
             object_id=object_id,
             token_id=token_id,
         )
 
         assert re.match(tx_pattern, result.tx_hash) is not None
         assert result.result is not None
-        assert result.thread.id == "15f576b9-2bba-446b-b416-5cff3687f5da"
+        assert result.thread.id == thread_id

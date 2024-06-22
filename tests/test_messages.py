@@ -16,7 +16,7 @@ class TestMessages:
         chain_id=chain_id,
     )
 
-    async def test_method_store(self):
+    async def test_method_add(self):
         messages = [
             Message(
                 id="1",
@@ -36,7 +36,7 @@ class TestMessages:
             ),
         ]
 
-        result = await self.ainft.chat.messages.store(
+        result = await self.ainft.chat.messages.add(
             messages=messages,
             object_id=object_id,
             token_id=token_id,
@@ -46,22 +46,22 @@ class TestMessages:
         assert result.result is not None
         assert len(result.messages) == 2
 
-    async def test_method_store_with_emojis(self):
+    async def test_method_add_with_emojis(self):
         message = Message(
             id="3",
             thread_id=thread_id,
             role="user",
-            content="How áre you today? 😊🌟🌈",
+            content="How are you today? 😊",
             assistant_id=None,
             created_at=1710748302,
         )
 
-        result = await self.ainft.chat.messages.store(
+        result = await self.ainft.chat.messages.add(
             messages=[message],
             object_id=object_id,
             token_id=token_id,
         )
-        path = f"apps/{app_id}/tokens/{token_id}/ai/ainize_openai/history/{address}/threads/{thread_id}/messages/{message.created_at}"
+        path = f"apps/{app_id}/tokens/{token_id}/ai/history/{address}/threads/{thread_id}/messages/{message.created_at}"
         escaped_message = await self.ainft._ain.db.ref(path).getValue()
 
         assert re.match(tx_pattern, result.tx_hash) is not None

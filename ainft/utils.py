@@ -77,7 +77,6 @@ async def validate_thread(
             "tokens",
             token_id,
             "ai",
-            "ainize_openai",
             "history",
             address,
             "threads",

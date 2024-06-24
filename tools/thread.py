@@ -19,7 +19,7 @@ async def main():
     thread_id = "YOUR_THREAD_ID"
 
     print("storing a thread")
-    res1 = await ainft.chat.threads.store(
+    res1 = await ainft.chat.threads.add(
         thread_id=thread_id,
         object_id=object_id,
         token_id=token_id,
@@ -44,7 +44,7 @@ async def main():
             created_at=1710645320,
         ),
     ]
-    res2 = await ainft.chat.messages.store(
+    res2 = await ainft.chat.messages.add(
         messages=messages,
         object_id=object_id,
         token_id=token_id,
@@ -53,13 +53,6 @@ async def main():
     for message in res2.messages:
         print("message: ", message)
     print()
-
-    # NOTE(jiyoung): read data from the ain blockchain database.
-    # print("reading blockchain db")
-    # value = await ainft._ain.db.ref(
-    #     f"apps/{app_id}/tokens/{token_id}/ai/ainize_openai/history"
-    # ).getValue()
-    # print(json.dumps(value, indent=4))
 
 
 asyncio.run(main())

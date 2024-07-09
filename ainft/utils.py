@@ -33,7 +33,7 @@ def join_paths(paths: list) -> str:
 
 
 def now() -> float:
-    return datetime.now().timestamp()
+    return datetime.now().timestamp() * 1000 # ms
 
 
 def truncate_text(text: str, max_length: int) -> str:
